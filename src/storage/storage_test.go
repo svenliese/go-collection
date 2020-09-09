@@ -1,6 +1,9 @@
 package storage
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
 func compareInt(t *testing.T, expected int, value int) {
 	if expected != value {
@@ -20,45 +23,54 @@ func compareDouble(t *testing.T, expected float64, value float64) {
 	}
 }
 
-func checkInt(t *testing.T, storage IStorage) {
+func checkInt(t *testing.T, writer IStorage, reader IStorage) {
 
-	storage.PutInt("test", 10)
-	storage.PutInt("test", 20)
+	writer.PutInt("test", 10)
+	writer.PutInt("test", 20)
 
-	var value = storage.GetInt()
+	var value = reader.GetInt()
 	compareInt(t, 10, value)
 
-	value = storage.GetInt()
+	value = reader.GetInt()
 	compareInt(t, 20, value)
 }
 
-func checkBool(t *testing.T, storage IStorage) {
+func checkBool(t *testing.T, writer IStorage, reader IStorage) {
 
-	storage.PutBool("test", true)
-	storage.PutBool("test", false)
+	writer.PutBool("test", true)
+	writer.PutBool("test", false)
 
-	var value = storage.GetBool()
+	var value = reader.GetBool()
 	compareBool(t, true, value)
 
-	value = storage.GetBool()
+	value = reader.GetBool()
 	compareBool(t, false, value)
 }
 
-func checkDouble(t *testing.T, storage IStorage) {
+func checkDouble(t *testing.T, writer IStorage, reader IStorage) {
 
-	storage.PutDouble("test", -0.1)
-	storage.PutDouble("test", 5.004)
+	writer.PutDouble("test", -0.1)
+	writer.PutDouble("test", 5.004)
 
-	var value = storage.GetDouble()
+	var value = reader.GetDouble()
 	compareDouble(t, -0.1, value)
 
-	value = storage.GetDouble()
+	value = reader.GetDouble()
 	compareDouble(t, 5.004, value)
 }
 
 func TestMemoryStorage(t *testing.T) {
 	storage := NewMemoryStorage()
-	checkInt(t, storage)
-	checkBool(t, storage)
-	checkDouble(t, storage)
+	checkInt(t, storage, storage)
+	checkBool(t, storage, storage)
+	checkDouble(t, storage, storage)
+}
+
+func TestFileStorage(t *testing.T) {
+	fileName := os.TempDir() + string(os.PathSeparator) + "test.txt"
+	writer := NewMFileStorageWriter(fileName)
+	reader := NewMFileStorageReader(fileName)
+	checkInt(t, writer, reader)
+	checkBool(t, writer, reader)
+	checkDouble(t, writer, reader)
 }
