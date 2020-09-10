@@ -24,12 +24,12 @@ func TestNeuron(t *testing.T) {
 	neuron1.calculateInput()
 	compareDouble(t, 0.0, neuron1.input)
 
-	neuron2 := NewNeuron(2, 1.0)
-	connection := NewConnection(neuron1, 0.5)
-	neuron2.addConnection(connection)
-	neuron1.setOutput(4.0)
+	neuron2 := NewSimpleNeuron(2)
+	neuron2.SetOutput(4.0)
+	connection := NewConnection(neuron2, 0.5)
 
-	neuron2.calculateInput()
-	neuron2.calculateOutput()
-	compareDouble(t, 1.0, neuron2.output)
+	neuron1.addConnection(connection)
+	neuron1.calculateInput()
+	neuron1.calculateOutput()
+	compareDouble(t, 1.0, neuron1.output)
 }

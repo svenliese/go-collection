@@ -5,32 +5,77 @@ import (
 	"math"
 )
 
+type INeuron interface {
+	GetId() int
+	GetOutput() float64
+	SetOutput(output float64)
+}
+
+//
+// SimpleNeuron
+//
+
+type SimpleNeuron struct {
+	id     int
+	output float64
+}
+
+func NewSimpleNeuron(id int) *SimpleNeuron {
+	return new(SimpleNeuron).init(id)
+}
+
+func (n *SimpleNeuron) init(id int) *SimpleNeuron {
+	n.id = id
+	n.output = 0.0
+	return n
+}
+
+func (n *SimpleNeuron) GetId() int {
+	return n.id
+}
+
+func (n *SimpleNeuron) GetOutput() float64 {
+	return n.output
+}
+
+func (n *SimpleNeuron) SetOutput(output float64) {
+	n.output = output
+}
+
+//
+// Connection
+//
+
 type Connection struct {
-	source *Neuron
+	source INeuron
 	// 0.0 <= factor <= 1.0
 	factor float64
 }
 
-func NewConnection(source *Neuron, factor float64) *Connection {
+func NewConnection(source INeuron, factor float64) *Connection {
 	return new(Connection).init(source, factor)
 }
 
-func (c *Connection) init(source *Neuron, factor float64) *Connection {
+func (c *Connection) init(source INeuron, factor float64) *Connection {
 	c.source = source
 	c.factor = factor
 	return c
 }
 
 func (c *Connection) getValue() float64 {
-	return c.factor * c.source.output
+	return c.factor * c.source.GetOutput()
 }
 
+//
+// Neuron
+//
+
 type Neuron struct {
-	id          int
+	SimpleNeuron
+
 	connections *list.List
 	input       float64
 	threshold   float64
-	output      float64
 }
 
 func NewNeuron(id int, threshold float64) *Neuron {
